@@ -1,4 +1,4 @@
-pub use crate::prelude::*;
+use crate::prelude::*;
 
 impl<'a> Solution<'a> for Day<1, { Part::One }> {
     type Transformed = Vec<usize>;
