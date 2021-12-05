@@ -1,10 +1,11 @@
 use crate::prelude::Part;
+use backtrace::Backtrace;
 use clap::{ArgSettings, Args, Parser, Subcommand};
 use colored::Colorize;
 use futures::FutureExt;
 use lazy_static::lazy_static;
 use reqwest::Client;
-use std::{any::Any, fmt::Display, panic::PanicInfo};
+use std::{any::Any, fmt::Display, panic::PanicInfo, sync::RwLock};
 
 lazy_static! {
     static ref IMPLEMENTED: Vec<Day> = crate::solution::IMPLEMENTED
@@ -157,6 +158,10 @@ fn parse_part(value: &str) -> Result<Part, &'static str> {
     }
 }
 
+lazy_static! {
+    static ref BACKTRACE: RwLock<Option<Backtrace>> = RwLock::new(None);
+}
+
 async fn _run(day: Day, input: &str) -> Option<Result<Box<dyn Display + '_>, PanicMessage>> {
     // We do this so that we don't print a useless message to stderr.
     std::panic::set_hook(Box::new(_panic_hook));
@@ -164,7 +169,8 @@ async fn _run(day: Day, input: &str) -> Option<Result<Box<dyn Display + '_>, Pan
     let result = async { crate::solution::run(day.number, day.part, input) }
         .catch_unwind()
         .await
-        .map_err(PanicMessage::new)
+        // SAFETY: This is in theory very prone to a race condition and is not safe whatsoever
+        .map_err(|message| PanicMessage::new(message, BACKTRACE.write().unwrap().take().unwrap()))
         .transpose();
 
     // We need to restore the default panic hook since we're done here. Taking the custom hook will restore the default,
@@ -176,15 +182,18 @@ async fn _run(day: Day, input: &str) -> Option<Result<Box<dyn Display + '_>, Pan
 
 // The following is some unfortunate panic glue
 
-fn _panic_hook(_: &PanicInfo<'_>) {}
+fn _panic_hook(_: &PanicInfo<'_>) {
+    BACKTRACE.write().unwrap().replace(Backtrace::new());
+}
 
 struct PanicMessage {
     message: Box<dyn Any + Send + 'static>,
+    backtrace: Backtrace,
 }
 
 impl PanicMessage {
-    fn new(message: Box<dyn Any + Send + 'static>) -> Self {
-        Self { message }
+    fn new(message: Box<dyn Any + Send + 'static>, backtrace: Backtrace) -> Self {
+        Self { message, backtrace }
     }
 }
 
@@ -199,6 +208,10 @@ impl Display for PanicMessage {
         match downcast {
             Some(message) => write!(f, r#""{}""#, message),
             None => f.write_str("<message of unknown type>"),
-        }
+        }?;
+
+        println!("{:?}", self.backtrace);
+
+        Ok(())
     }
 }
