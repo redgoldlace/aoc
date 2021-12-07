@@ -67,7 +67,7 @@ pub fn winning_board(numbers: &[usize], boards: &mut [Grid<Cell>]) -> Option<(us
     None
 }
 
-pub type Coordinate = (usize, usize);
+pub type Coordinate<T = usize> = (T, T);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Cell {
