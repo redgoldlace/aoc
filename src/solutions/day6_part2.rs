@@ -1,8 +1,5 @@
-use std::collections::HashMap;
-
-use crate::prelude::*;
-
 use super::day6::tick;
+use crate::prelude::*;
 
 impl<'a> Solution<'a> for Day<6, { Part::Two }> {
     type Transformed = Vec<usize>;
