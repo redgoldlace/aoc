@@ -1,7 +1,6 @@
-use std::collections::HashSet;
-
 use super::day4::{Cell, Grid};
 use crate::prelude::*;
+use std::collections::HashSet;
 
 impl<'a> Solution<'a> for Day<4, { Part::Two }> {
     type Transformed = (Vec<usize>, Vec<Grid<Cell>>);

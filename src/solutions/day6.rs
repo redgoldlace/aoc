@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-
 use crate::prelude::*;
 
 impl<'a> Solution<'a> for Day<6, { Part::One }> {
