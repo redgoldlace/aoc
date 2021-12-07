@@ -1,6 +1,7 @@
 // I am a being of chaos and destruction
 #![allow(incomplete_features)]
 #![feature(adt_const_params)]
+#![feature(slice_group_by)]
 
 use app::App;
 pub mod app;
