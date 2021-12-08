@@ -1,28 +1,25 @@
-use crate::prelude::*;
+aoc!(day = 7, part = 1);
 
-impl<'a> Solution<'a> for Day<7, { Part::One }> {
-    type Transformed = Vec<usize>;
-    type Result = usize;
+#[transform]
+fn transform(input:_) -> Vec<usize> {
+    input
+        .split(',')
+        .map(|n| n.trim().parse().unwrap())
+        .collect()
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        input
-            .split(',')
-            .map(|n| n.trim().parse().unwrap())
-            .collect()
-    }
-
-    fn solve(input: Self::Transformed) -> Self::Result {
-        (0_usize..=input.iter().copied().max().unwrap())
-            .map(|position| {
-                input
-                    .iter()
-                    .copied()
-                    .map(|crab| difference(crab, position))
-                    .sum::<usize>()
-            })
-            .min()
-            .unwrap()
-    }
+#[solve]
+fn solve(input: _) -> usize {
+    (0_usize..=input.iter().copied().max().unwrap())
+        .map(|position| {
+            input
+                .iter()
+                .copied()
+                .map(|crab| difference(crab, position))
+                .sum::<usize>()
+        })
+        .min()
+        .unwrap()
 }
 
 pub fn difference(a: usize, b: usize) -> usize {

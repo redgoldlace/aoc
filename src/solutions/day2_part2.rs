@@ -1,27 +1,22 @@
+aoc!(day = 2, part = 2);
+
 use super::day2::Instruction;
-use crate::prelude::*;
 use std::{iter::Sum, ops::Add};
 
-impl<'a> Solution<'a> for Day<2, { Part::Two }> {
-    type Transformed = Vec<Instruction>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<Instruction> {
+    <day!(2)>::transform(input)
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        input
-            .lines()
-            .map(|line| line.parse::<Instruction>().unwrap())
-            .collect()
-    }
+#[solve]
+fn solve(input: _) -> usize {
+    let final_position = input
+        .into_iter()
+        .fold(Movement::default(), |position, instruction| {
+            position.step_by(instruction)
+        });
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let final_position = input
-            .into_iter()
-            .fold(Movement::default(), |position, instruction| {
-                position.step_by(instruction)
-            });
-
-        (final_position.horizontal * final_position.depth) as usize
-    }
+    (final_position.horizontal * final_position.depth) as usize
 }
 
 #[derive(Debug, Default, Clone)]

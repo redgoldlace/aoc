@@ -1,26 +1,24 @@
+aoc!(day = 4, part = 2);
+
 use super::day4::{Cell, Grid};
-use crate::prelude::*;
 use std::collections::HashSet;
 
-impl<'a> Solution<'a> for Day<4, { Part::Two }> {
-    type Transformed = (Vec<usize>, Vec<Grid<Cell>>);
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> (Vec<usize>, Vec<Grid<Cell>>) {
+    <day!(4)>::transform(input)
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        Day::<4, { Part::One }>::transform(input)
-    }
+#[solve]
+fn solve((numbers, mut boards): _) -> usize {
+    let (last_called, winning_index) = last_to_win(&numbers, &mut boards)
+        .expect("expected at least one winner. this is bingo. c'mon.");
 
-    fn solve((numbers, mut boards): Self::Transformed) -> Self::Result {
-        let (last_called, winning_index) = last_to_win(&numbers, &mut boards)
-            .expect("expected at least one winner. this is bingo. c'mon.");
+    let unmarked = boards[winning_index]
+        .iter()
+        .filter_map(|cell| (!cell.marked).then(|| cell.number))
+        .sum::<usize>();
 
-        let unmarked = boards[winning_index]
-            .iter()
-            .filter_map(|cell| (!cell.marked).then(|| cell.number))
-            .sum::<usize>();
-
-        unmarked * last_called
-    }
+    unmarked * last_called
 }
 
 pub fn last_to_win(numbers: &[usize], boards: &mut [Grid<Cell>]) -> Option<(usize, usize)> {

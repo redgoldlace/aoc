@@ -1,39 +1,35 @@
+aoc!(day = 6, part = 1);
+
 use std::collections::HashMap;
-use crate::prelude::*;
 
-impl<'a> Solution<'a> for Day<6, { Part::One }> {
-    type Transformed = Vec<usize>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<usize> {
+    let mut buffer = input
+        .split(',')
+        .map(|n| n.trim().parse::<usize>().unwrap())
+        .collect::<Vec<_>>();
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        let mut buffer = input
-            .split(',')
-            .map(|n| n.trim().parse::<usize>().unwrap())
-            .collect::<Vec<_>>();
+    buffer.sort();
 
-        buffer.sort();
+    let occurrences = buffer
+        .group_by(|&a, &b| a == b)
+        .map(|group| (group[0], group.len()))
+        .collect::<HashMap<_, _>>();
 
-        let occurrences = buffer
-            .group_by(|&a, &b| a == b)
-            .map(|group| (group[0], group.len()))
-            .collect::<HashMap<_, _>>();
+    (0..9)
+        .map(|n| occurrences.get(&n).copied().unwrap_or_default())
+        .collect()
+}
 
-        println!("{:?}", occurrences);
+#[solve]
+fn solve(input: _) -> usize {
+    let mut counts = input;
 
-        (0..9)
-            .map(|n| occurrences.get(&n).copied().unwrap_or_default())
-            .collect::<Vec<_>>()
+    for _ in 0..80 {
+        tick(&mut counts);
     }
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let mut counts = input;
-
-        for _ in 0..80 {
-            tick(&mut counts);
-        }
-
-        counts.iter().copied().sum::<usize>()
-    }
+    counts.iter().copied().sum::<usize>()
 }
 
 pub fn tick(counts: &mut Vec<usize>) {

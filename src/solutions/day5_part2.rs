@@ -1,34 +1,32 @@
+aoc!(day = 5, part = 2);
+
 use super::{
     day4::Coordinate,
     day5::{adjacent, line},
 };
-use crate::prelude::*;
 use std::collections::HashMap;
 
-impl<'a> Solution<'a> for Day<5, { Part::Two }> {
-    type Transformed = Vec<(Coordinate, Coordinate)>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<(Coordinate, Coordinate)> {
+    <day!(5)>::transform(input)
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        Day::<5, { Part::One }>::transform(input)
-    }
+#[solve]
+fn solve(input: _) -> usize {
+    let mut map = HashMap::<Coordinate, usize>::new();
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let mut map = HashMap::<Coordinate, usize>::new();
-
-        for (start, end) in input.iter().copied() {
-            // This is a boolean logic hack that works because We're Lucky™ (lines can never be adjacent *and* diagonal)
-            if adjacent(start, end) == diagonal(start, end) {
-                continue;
-            }
-
-            for point in line(start, end) {
-                *map.entry(point).or_default() += 1;
-            }
+    for (start, end) in input.iter().copied() {
+        // This is a boolean logic hack that works because We're Lucky™ (lines can never be adjacent *and* diagonal)
+        if adjacent(start, end) == diagonal(start, end) {
+            continue;
         }
 
-        map.values().copied().filter(|&count| count >= 2).count()
+        for point in line(start, end) {
+            *map.entry(point).or_default() += 1;
+        }
     }
+
+    map.values().copied().filter(|&count| count >= 2).count()
 }
 
 pub fn diagonal((x1, y1): Coordinate, (x2, y2): Coordinate) -> bool {

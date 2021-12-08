@@ -1,38 +1,36 @@
+aoc!(day = 5, part = 1);
+
 use super::day4::Coordinate;
-use crate::prelude::*;
 use lerp::Lerp;
 use std::collections::HashMap;
 
-impl<'a> Solution<'a> for Day<5, { Part::One }> {
-    type Transformed = Vec<(Coordinate, Coordinate)>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<(Coordinate, Coordinate)> {
+    input
+        .lines()
+        .map(|line| {
+            let mut split = line.split("->").map(|pair| parse_point(pair.trim()));
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        input
-            .lines()
-            .map(|line| {
-                let mut split = line.split("->").map(|pair| parse_point(pair.trim()));
+            (split.next().unwrap(), split.next().unwrap())
+        })
+        .collect()
+}
 
-                (split.next().unwrap(), split.next().unwrap())
-            })
-            .collect()
-    }
+#[solve]
+fn solve(input: _) -> usize {
+    let mut map = HashMap::<Coordinate, usize>::new();
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let mut map = HashMap::<Coordinate, usize>::new();
-
-        for (start, end) in input.iter().copied() {
-            if !adjacent(start, end) {
-                continue;
-            }
-
-            for point in line(start, end) {
-                *map.entry(point).or_default() += 1;
-            }
+    for (start, end) in input.iter().copied() {
+        if !adjacent(start, end) {
+            continue;
         }
 
-        map.values().copied().filter(|&count| count >= 2).count()
+        for point in line(start, end) {
+            *map.entry(point).or_default() += 1;
+        }
     }
+
+    map.values().copied().filter(|&count| count >= 2).count()
 }
 
 pub fn parse_point(line: &str) -> Coordinate {

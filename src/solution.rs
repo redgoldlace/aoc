@@ -37,3 +37,26 @@ pub trait Solution<'a> {
 // running `aoc run latest`.
 
 include!(concat!(env!("OUT_DIR"), "/run.rs"));
+
+#[macro_export]
+macro_rules! day {
+    ($number:literal) => {
+        $crate::solution::Day::<$number, { $crate::part!(1) }>
+    };
+    ($number:literal part 1) => {
+        $crate::solution::Day::<$number, { $crate::part!(1) }>
+    };
+    ($number:literal part 2) => {
+        $crate::solution::Day::<$number, { $crate::part!(2) }>
+    };
+}
+
+#[macro_export]
+macro_rules! part {
+    (1) => {
+        $crate::solution::Part::One
+    };
+    (2) => {
+        $crate::solution::Part::Two
+    };
+}

@@ -1,51 +1,49 @@
-use crate::prelude::*;
+aoc!(day = 4, part = 1);
+
 use std::ops::{Index, IndexMut};
 
-impl<'a> Solution<'a> for Day<4, { Part::One }> {
-    type Transformed = (Vec<usize>, Vec<Grid<Cell>>);
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> (Vec<usize>, Vec<Grid<Cell>>) {
+    let mut lines = input.lines();
+    let mut boards = Vec::new();
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        let mut lines = input.lines();
-        let mut boards = Vec::new();
+    let numbers = lines
+        .next()
+        .unwrap()
+        .split(',')
+        .map(|number| number.parse::<usize>().unwrap())
+        .collect::<Vec<_>>();
 
-        let numbers = lines
-            .next()
-            .unwrap()
-            .split(',')
-            .map(|number| number.parse::<usize>().unwrap())
+    while lines.next().is_some() {
+        let items = lines
+            .by_ref()
+            .take(5)
+            .flat_map(|line| {
+                line.split_whitespace()
+                    .map(|number| number.parse::<usize>().unwrap())
+            })
+            .map(Cell::new)
             .collect::<Vec<_>>();
 
-        while lines.next().is_some() {
-            let items = lines
-                .by_ref()
-                .take(5)
-                .flat_map(|line| {
-                    line.split_whitespace()
-                        .map(|number| number.parse::<usize>().unwrap())
-                })
-                .map(Cell::new)
-                .collect::<Vec<_>>();
+        let grid = Grid::from_raw_parts(5, 5, items.into_boxed_slice());
 
-            let grid = Grid::from_raw_parts(5, 5, items.into_boxed_slice());
-
-            boards.push(grid);
-        }
-
-        (numbers, boards)
+        boards.push(grid);
     }
 
-    fn solve((numbers, mut boards): Self::Transformed) -> Self::Result {
-        let (last_called, winning_index) = winning_board(&numbers, &mut boards)
-            .expect("expected at least one winner. this is bingo. c'mon.");
+    (numbers, boards)
+}
 
-        let unmarked = boards[winning_index]
-            .iter()
-            .filter_map(|cell| (!cell.marked).then(|| cell.number))
-            .sum::<usize>();
+#[solve]
+fn solve((numbers, mut boards): _) -> usize {
+    let (last_called, winning_index) = winning_board(&numbers, &mut boards)
+        .expect("expected at least one winner. this is bingo. c'mon.");
 
-        unmarked * last_called
-    }
+    let unmarked = boards[winning_index]
+        .iter()
+        .filter_map(|cell| (!cell.marked).then(|| cell.number))
+        .sum::<usize>();
+
+    unmarked * last_called
 }
 
 // We run into Borrowing Woes™ here, so we return a (last number, board index) pair instead of the last number

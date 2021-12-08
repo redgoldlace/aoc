@@ -5,7 +5,12 @@ use colored::Colorize;
 use futures::FutureExt;
 use lazy_static::lazy_static;
 use reqwest::Client;
-use std::{any::Any, fmt::Display, panic::PanicInfo, sync::RwLock};
+use std::{
+    any::Any,
+    fmt::Display,
+    panic::{AssertUnwindSafe, PanicInfo},
+    sync::RwLock,
+};
 
 lazy_static! {
     static ref IMPLEMENTED: Vec<Day> = crate::solution::IMPLEMENTED
@@ -54,9 +59,13 @@ impl App {
             .into_iter()
             .collect::<Result<Vec<_>, _>>()?;
 
-        for (day, input) in IMPLEMENTED.iter().copied().zip(inputs) {
-            self.run_solution(day, &input).await;
-        }
+        let futures = IMPLEMENTED
+            .iter()
+            .copied()
+            .zip(inputs)
+            .map(|(day, input)| async move { self.run_solution(day, input, true).await });
+
+        futures::future::join_all(futures).await;
 
         Ok(())
     }
@@ -64,7 +73,7 @@ impl App {
     async fn run_specific(&self, day: Day) -> reqwest::Result<()> {
         println!("{}: Fetching input...", day);
         let input = self.fetch_input(day).await?;
-        self.run_solution(day, &input).await;
+        self.run_solution(day, input, false).await;
 
         Ok(())
     }
@@ -83,7 +92,7 @@ impl App {
             .await
     }
 
-    async fn run_solution(&self, day: Day, input: &str) {
+    async fn run_solution(&self, day: Day, input: String, suppress: bool) {
         if !IMPLEMENTED.contains(&day) {
             println!(
                 "{}: {}! Solution does not exist",
@@ -94,7 +103,9 @@ impl App {
             return;
         }
 
-        println!("{}: Running solution...", day);
+        if !suppress {
+            println!("{}: Running solution...", day);
+        }
 
         // SAFETY: We've already checked that this is a valid solution.
         match _run(day, input).await.unwrap() {
@@ -128,7 +139,7 @@ pub enum Run {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Args)]
 pub struct Day {
-    #[clap(short, long, name = "day")]
+    #[clap(short, long = "number", long = "day", name = "day")]
     pub(crate) number: u8,
     #[clap(long = "part", default_value = "1", parse(try_from_str = parse_part))]
     pub(crate) part: Part,
@@ -162,13 +173,22 @@ lazy_static! {
     static ref BACKTRACE: RwLock<Option<Backtrace>> = RwLock::new(None);
 }
 
-async fn _run(day: Day, input: &str) -> Option<Result<Box<dyn Display + '_>, PanicMessage>> {
+async fn _run(day: Day, input: String) -> Option<Result<String, PanicMessage>> {
     // We do this so that we don't print a useless message to stderr.
     std::panic::set_hook(Box::new(_panic_hook));
 
-    let result = async { crate::solution::run(day.number, day.part, input) }
+    let run = move || {
+        let input = input;
+        let result = crate::solution::run(day.number, day.part, &input)?;
+
+        Some(result.to_string())
+    };
+
+    // SAFETY: Probably not?
+    let result = AssertUnwindSafe(tokio::task::spawn_blocking(run))
         .catch_unwind()
         .await
+        .map(|result| result.unwrap())
         // SAFETY: This is in theory very prone to a race condition and is not safe whatsoever
         .map_err(|message| PanicMessage::new(message, BACKTRACE.write().unwrap().take().unwrap()))
         .transpose();

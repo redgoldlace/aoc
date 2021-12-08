@@ -1,24 +1,23 @@
-use crate::prelude::*;
+aoc!(day = 2, part = 1);
+
 use std::{convert::Infallible, iter::Sum, ops::Add, str::FromStr};
 
-impl<'a> Solution<'a> for Day<2, { Part::One }> {
-    type Transformed = Vec<Instruction>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<Instruction> {
+    input
+        .lines()
+        .map(|line| line.parse::<Instruction>().unwrap())
+        .collect()
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        input
-            .lines()
-            .map(|line| line.parse::<Instruction>().unwrap())
-            .collect()
-    }
+#[solve]
+fn solve(input: _) -> usize {
+    let final_position = input
+        .into_iter()
+        .map(Into::<Movement>::into)
+        .sum::<Movement>();
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let final_position = input
-            .into_iter()
-            .map(Into::<Movement>::into)
-            .sum::<Movement>();
-        (final_position.horizontal * final_position.depth) as usize
-    }
+    (final_position.horizontal * final_position.depth) as usize
 }
 
 impl FromStr for Instruction {

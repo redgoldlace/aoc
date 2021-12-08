@@ -1,21 +1,19 @@
+aoc!(day = 6, part = 2);
+
 use super::day6::tick;
-use crate::prelude::*;
 
-impl<'a> Solution<'a> for Day<6, { Part::Two }> {
-    type Transformed = Vec<usize>;
-    type Result = usize;
+#[transform]
+fn transform(input: _) -> Vec<usize> {
+    <day!(6)>::transform(input)
+}
 
-    fn transform(input: &'a str) -> Self::Transformed {
-        Day::<6, { Part::One }>::transform(input)
+#[solve]
+fn solve(input: _) -> usize {
+    let mut counts = input;
+
+    for _ in 0..256 {
+        tick(&mut counts);
     }
 
-    fn solve(input: Self::Transformed) -> Self::Result {
-        let mut counts = input;
-
-        for _ in 0..256 {
-            tick(&mut counts);
-        }
-
-        counts.iter().copied().sum::<usize>()
-    }
+    counts.iter().copied().sum()
 }
