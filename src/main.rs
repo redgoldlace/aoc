@@ -20,9 +20,8 @@ pub mod prelude {
     pub use super::solution::{Day, Part, Solution};
 }
 
-#[tokio::main]
-async fn main() {
-    let result = App::run().await;
+fn main() {
+    let result = App::run();
 
     if let Err(ref err) = result {
         eprintln!("{}", err);
