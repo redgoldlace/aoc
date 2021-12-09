@@ -31,14 +31,13 @@ fn solve(input: _) -> usize {
 pub fn select(grid: &Grid<usize>, position: Coordinate) -> HashSet<Coordinate> {
     // This is essentially just a stack-based DFS or similar. Since all basins in the input are wrapped by 9s, our lives
     // are really easy.
-    fn select(
-        set: &mut HashSet<Coordinate>,
-        stack: &mut Vec<Coordinate>,
-        grid: &Grid<usize>,
-        position: Coordinate,
-    ) {
+
+    let mut set = HashSet::new();
+    let mut stack = vec![position];
+
+    while let Some(position) = stack.pop() {
         if grid[position] == 9 || set.contains(&position) {
-            return;
+            continue;
         }
 
         set.insert(position);
@@ -46,13 +45,6 @@ pub fn select(grid: &Grid<usize>, position: Coordinate) -> HashSet<Coordinate> {
         for (adjacent_position, _) in grid.adjacent(position) {
             stack.push(adjacent_position)
         }
-    }
-
-    let mut set = HashSet::new();
-    let mut stack = vec![position];
-
-    while let Some(position) = stack.pop() {
-        select(&mut set, &mut stack, grid, position)
     }
 
     set
