@@ -24,7 +24,6 @@ fn solve(input: _) -> usize {
         .collect::<Vec<_>>();
 
     basins.sort();
-
     basins.iter().rev().take(3).product()
 }
 
@@ -41,10 +40,7 @@ pub fn select(grid: &Grid<usize>, position: Coordinate) -> HashSet<Coordinate> {
         }
 
         set.insert(position);
-
-        for (adjacent_position, _) in grid.adjacent(position) {
-            stack.push(adjacent_position)
-        }
+        stack.extend(grid.adjacent(position).map(|(adjacent, _)| adjacent))
     }
 
     set
