@@ -1,8 +1,7 @@
 aoc!(day = 9, part = 2);
 
-use std::collections::HashSet;
-
 use super::day4::{Coordinate, Grid};
+use std::collections::HashSet;
 
 #[transform]
 fn transform(input: _) -> Grid<usize> {
@@ -40,7 +39,7 @@ pub fn select(grid: &Grid<usize>, position: Coordinate) -> HashSet<Coordinate> {
         }
 
         set.insert(position);
-        stack.extend(grid.adjacent(position).map(|(adjacent, _)| adjacent))
+        stack.extend(grid.adjacent(position).map(|(adjacent, _)| adjacent));
     }
 
     set
