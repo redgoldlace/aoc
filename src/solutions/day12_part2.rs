@@ -1,7 +1,6 @@
 aoc!(day = 12, part = 2);
 
 use super::day12::Cave;
-use indexmap::IndexSet;
 use std::collections::{HashMap, HashSet};
 
 #[transform]
@@ -16,17 +15,17 @@ fn solve(input: _) -> usize {
 
 pub fn distinct_paths_with_revisiting<'a>(
     cave_mapping: &HashMap<Cave<'a>, HashSet<Cave<'a>>>,
-) -> HashSet<Vec<Cave<'a>>> {
-    let mut paths = IndexSet::<(bool, Vec<Cave>)>::new();
-    let mut results = HashSet::<Vec<Cave>>::new();
+) -> Vec<Vec<Cave<'a>>> {
+    let mut paths = Vec::<(bool, Vec<Cave>)>::new();
+    let mut results = Vec::<Vec<Cave>>::new();
 
-    paths.insert((false, vec![Cave::Start]));
+    paths.push((false, vec![Cave::Start]));
 
     while let Some((has_revisited, path)) = paths.pop() {
         let last = path.last().copied().unwrap();
 
         if last.is_end() {
-            results.insert(path);
+            results.push(path);
             continue;
         }
 
@@ -41,7 +40,7 @@ pub fn distinct_paths_with_revisiting<'a>(
             let mut new_path = path.clone();
             new_path.push(next);
 
-            paths.insert((has_revisited || revisited_this, new_path));
+            paths.push((has_revisited || revisited_this, new_path));
         }
     }
 

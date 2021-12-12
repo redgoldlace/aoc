@@ -1,6 +1,5 @@
 aoc!(day = 12, part = 1);
 
-use indexmap::IndexSet;
 use std::collections::{HashMap, HashSet};
 
 #[transform]
@@ -26,17 +25,17 @@ fn solve(input: _) -> usize {
 
 pub fn distinct_paths<'a>(
     cave_mapping: &HashMap<Cave<'a>, HashSet<Cave<'a>>>,
-) -> HashSet<Vec<Cave<'a>>> {
-    let mut paths = IndexSet::<Vec<Cave>>::new();
-    let mut results = HashSet::<Vec<Cave>>::new();
+) -> Vec<Vec<Cave<'a>>> {
+    let mut paths = Vec::<Vec<Cave>>::new();
+    let mut results = Vec::<Vec<Cave>>::new();
 
-    paths.insert(vec![Cave::Start]);
+    paths.push(vec![Cave::Start]);
 
     while let Some(path) = paths.pop() {
         let last = path.last().copied().unwrap();
 
         if last.is_end() {
-            results.insert(path);
+            results.push(path);
             continue;
         }
 
@@ -48,7 +47,7 @@ pub fn distinct_paths<'a>(
             let mut new_path = path.clone();
             new_path.push(next);
 
-            paths.insert(new_path);
+            paths.push(new_path);
         }
     }
 
