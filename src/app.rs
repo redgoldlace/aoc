@@ -3,7 +3,7 @@ use clap::{ArgSettings, Args, Parser, Subcommand};
 use colored::Colorize;
 use lazy_static::lazy_static;
 use reqwest::Client;
-use std::{any::Any, fmt::Display};
+use std::{any::Any, fmt::Display, time::Instant};
 use tokio::runtime::Runtime;
 
 lazy_static! {
@@ -102,10 +102,12 @@ impl App {
             println!("{}: Running solution...", day);
         }
 
+        let now = Instant::now();
+
         // SAFETY: We've already checked that this is a valid solution.
         match _run(day, input).unwrap() {
             Ok(value) => {
-                println!("{}: {}!", day, "Ok".green().bold(),);
+                println!("{}: {}! Took {}ms", day, "Ok".green().bold(), now.elapsed().as_millis());
                 println!("{}", value.to_string().italic());
             }
             Err(err) => {
