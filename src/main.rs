@@ -2,6 +2,7 @@
 #![allow(incomplete_features)]
 #![feature(adt_const_params)]
 #![feature(let_else)]
+#![feature(hash_drain_filter)]
 #![feature(slice_group_by)]
 #![feature(custom_inner_attributes)]
 #![feature(proc_macro_hygiene)]
