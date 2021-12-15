@@ -26,7 +26,7 @@ pub fn match_symbols(sequence: &[Symbol]) -> Option<Delimiter> {
             continue;
         }
 
-        let Symbol(_, opening_delimiter) = stack.pop().expect("stack underrun");
+        let Symbol(_, opening_delimiter) = stack.pop().expect("stack underflow");
 
         if delimiter != opening_delimiter {
             return Some(delimiter);
