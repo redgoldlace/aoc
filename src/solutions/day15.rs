@@ -1,7 +1,6 @@
 aoc!(day = 15, part = 1);
 
 use super::day4::{Coordinate, Grid};
-use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, collections::BinaryHeap};
 
 #[transform]
@@ -44,12 +43,9 @@ impl PartialOrd for State {
 
 pub fn djikstra(grid: &Grid<usize>, start: Coordinate, end: Coordinate) -> Option<usize> {
     let mut heap = BinaryHeap::new();
-    let mut distance: FxHashMap<_, _> = grid
-        .coordinates()
-        .map(|coordinate| (coordinate, usize::MAX))
-        .collect();
+    let mut distance: Grid<usize> = Grid::new_from_copy(grid.width(), grid.height(), usize::MAX);
 
-    distance.insert(start, 0);
+    distance[start] = 0;
     heap.push(State(0, start));
 
     while let Some(State(cost, position)) = heap.pop() {
@@ -57,15 +53,15 @@ pub fn djikstra(grid: &Grid<usize>, start: Coordinate, end: Coordinate) -> Optio
             return Some(cost);
         }
 
-        if cost > distance[&position] {
+        if cost > distance[position] {
             continue;
         }
 
         for (adjacent_position, &adjacent_cost) in grid.adjacent(position) {
             let new_cost = cost + adjacent_cost;
 
-            if new_cost < distance[&adjacent_position] {
-                distance.insert(adjacent_position, new_cost);
+            if new_cost < distance[adjacent_position] {
+                distance[adjacent_position] = new_cost;
                 heap.push(State(new_cost, adjacent_position));
             }
         }
