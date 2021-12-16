@@ -15,3 +15,6 @@ Cargo.lock
 
 # This is created by the CLI, and stores a secret token that is used for submissions.
 .aoc_session
+
+# Cruft
+.vscode/

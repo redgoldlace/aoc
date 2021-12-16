@@ -107,7 +107,16 @@ impl App {
         // SAFETY: We've already checked that this is a valid solution.
         match _run(day, input).unwrap() {
             Ok(value) => {
-                println!("{}: {}! Took {}ms", day, "Ok".green().bold(), now.elapsed().as_millis());
+                let elapsed = now.elapsed();
+
+                println!(
+                    "{}: {}! Took {}ms ({} micros)",
+                    day,
+                    "Ok".green().bold(),
+                    elapsed.as_millis(),
+                    elapsed.as_micros()
+                );
+
                 println!("{}", value.to_string().italic());
             }
             Err(err) => {
