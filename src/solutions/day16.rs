@@ -171,7 +171,7 @@ macro_rules! bits {
 }
 
 pub struct Stream<'a, T> {
-    buffer: &'a [T],
+    pub(crate) buffer: &'a [T],
 }
 
 impl<'a, T> Stream<'a, T> {
